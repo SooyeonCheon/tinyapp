@@ -32,8 +32,6 @@ app.get('/urls/:id', (req, res) => {
 app.post('/urls/:id', (req, res) => {
   const id = req.params.id;
   urlDatabase[id] = req.body.newUrl;
-  console.log('req.params', req.params);
-  console.log('req.body', req.body);
   res.redirect('/urls');
 });
 
@@ -61,8 +59,13 @@ app.get('/u/:id', (req, res) => {
   res.redirect(longURL);
 });
 
-app.post('/urls/:id/delete', (req,res) => {
+app.post('/urls/:id/delete', (req, res) => {
   delete urlDatabase[req.params.id];
+  res.redirect('/urls');
+});
+
+app.post('/login', (req, res) => {
+  res.cookie('username', req.body.username);
   res.redirect('/urls');
 });
 
