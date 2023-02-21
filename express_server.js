@@ -15,19 +15,6 @@ app.get('/', (req, res) => {
   res.send('Hello!');
 });
 
-app.listen(PORT, () => {
-  console.log(`Example app listening on port ${PORT}`);
-});
-
-app.get('/urls.json', (req, res) => {
-  res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  const templateVars = { greeting: "Hello World!" };
-  res.render("hello_world", templateVars);
-});
-
 app.get('/urls', (req, res) => {
   const templateVars = { urls: urlDatabase };
   res.render('urls_index', templateVars);
@@ -42,11 +29,30 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+function generateRandomString() {
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+
+  while (randomString.length < 6) {
+    randomString += chars[Math.floor(Math.random() * chars.length)];
+  }
+
+  return randomString;
+}
+
 app.post('/urls', (req, res) => {
-  console.log(req.body);
-  res.send('Ok');
+  let newId = generateRandomString();
+  urlDatabase[newId] = req.body.longURL;
+  
+  res.redirect(`/urls/${newId}`);
 });
 
-function generateRandomString() {
-  return 100000 + Math.floor(Math.random() * 900000);
-}
+app.get("/u/:id", (req, res) => {
+  const longURL = urlDatabase[req.params.id];
+
+  res.redirect(longURL);
+});
+
+app.listen(PORT, () => {
+  console.log(`Example app listening on port ${PORT}`);
+});
