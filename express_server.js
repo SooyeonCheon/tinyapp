@@ -29,6 +29,14 @@ app.get('/urls/:id', (req, res) => {
   res.render('urls_show', templateVars);
 });
 
+app.post('/urls/:id', (req, res) => {
+  const id = req.params.id;
+  urlDatabase[id] = req.body.newUrl;
+  console.log('req.params', req.params);
+  console.log('req.body', req.body);
+  res.redirect('/urls');
+});
+
 function generateRandomString() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   let randomString = '';
