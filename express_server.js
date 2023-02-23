@@ -1,11 +1,12 @@
 const express = require("express");
+const cookieParser = require("cookie-parser");
+const bcrypt = require('bcryptjs');
 const app = express();
 const PORT = 8080;
 
 // config
 app.set("view engine", "ejs");
 // middleware
-const cookieParser = require("cookie-parser");
 app.use(cookieParser()); // populate req.cookies
 app.use(express.urlencoded({ extended: true }));
 
@@ -201,7 +202,7 @@ app.post("/login", (req, res) => {
   if (!foundUser) {
     return res.status(403).send("No user with that email found<br><a href='/login'>Login</a>");
   }
-  if (foundUser.password !== password) {
+  if (!bcrypt.compareSync(password, foundUser.password)) {
     return res.status(403).send("Passwords do not match<br><a href='/login'>Login</a>");
   }
 
@@ -231,10 +232,11 @@ app.post("/register", (req, res) => {
   const randomID = generateRandomString();
   const email = req.body.email;
   const password = req.body.password;
+  const hashedPassword = bcrypt.hashSync(password, 10);
   const newUserObj = {
     id: randomID,
     email: email,
-    password: password,
+    password: hashedPassword,
   };
 
   if (!email || !password) {
