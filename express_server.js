@@ -90,12 +90,15 @@ app.post("/urls", (req, res) => {
 
 // short, long url information
 app.get("/urls/:id", (req, res) => {
-  if (!req.session.user_id) {
-    return res.status(400).send("Please Login first.<br><a href='/login'>Login</a>");
-  };
   const findID = findURLid(req.params.id, urlDatabase);
   if (!findID) {
     return res.status(400).send("The shortened url does not exist");
+  };
+  if (!req.session.user_id) {
+    return res.status(400).send("Please Login first.<br><a href='/login'>Login</a>");
+  };
+  if (urlDatabase[req.params.id].userID !== req.session.user_id) {
+    return res.status(400).send("You have no authority.");
   };
   const templateVars = {
     id: req.params.id,
