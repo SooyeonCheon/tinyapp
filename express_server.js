@@ -1,6 +1,7 @@
 const express = require("express");
 const cookieSession = require('cookie-session');
 const bcrypt = require('bcryptjs');
+const methodOverride = require('method-override');
 const { generateRandomString, getUserByEmail, urlsForUser, findURLid } = require('./helpers');
 const app = express();
 const PORT = 8080;
@@ -8,11 +9,12 @@ const PORT = 8080;
 // config
 app.set("view engine", "ejs");
 // middleware
+app.use(express.urlencoded({ extended: true }));
 app.use(cookieSession({
   name: 'session',
   keys: ['key1', 'key2']
 }));
-app.use(express.urlencoded({ extended: true }));
+app.use(methodOverride('_method'));
 
 // url, user obj
 const urlDatabase = {
@@ -109,7 +111,7 @@ app.get("/urls/:id", (req, res) => {
 });
 
 // edit
-app.post("/urls/:id", (req, res) => {
+app.put("/urls/:id", (req, res) => {
   const id = req.params.id;
   if (!req.session.user_id || (urlDatabase[id].userID !== req.session.user_id)) {
     return res.status(400).send("You have no authority.");
@@ -123,7 +125,7 @@ app.post("/urls/:id", (req, res) => {
 });
 
 // delete
-app.post("/urls/:id/delete", (req, res) => {
+app.delete("/urls/:id/delete", (req, res) => {
   const id = req.params.id;
   if (!req.session.user_id || (urlDatabase[id].userID !== req.session.user_id)) {
     return res.status(400).send("You have no authority.");
